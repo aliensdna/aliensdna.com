@@ -256,8 +256,8 @@ function Witness() {
         <figure className="order-1 md:order-2 md:col-span-7 md:flex md:justify-end">
           <div className="film-iris overflow-hidden">
             <LoopFilm
-              src="/films/iris.mp4"
-              poster="/films/iris-poster.jpg"
+              src="/films/iris.mp4?v=3"
+              poster="/films/iris-poster.jpg?v=3"
               label="Untyped iris — a close study of a blinking reptilian eye"
               className="archive-frame rounded-lg"
             />

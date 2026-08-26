@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useLoopingClip } from "@/lib/use-looping-clip";
 import { cn } from "@/lib/utils";
 
 export function LoopFilm({
@@ -12,8 +13,8 @@ export function LoopFilm({
   label: string;
   className?: string;
 }) {
-  const ref = useRef<HTMLVideoElement>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const ref = useLoopingClip(!reduceMotion);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -22,18 +23,6 @@ export function LoopFilm({
     media.addEventListener("change", sync);
     return () => media.removeEventListener("change", sync);
   }, []);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node || reduceMotion) return;
-    node.muted = true;
-    const play = () => {
-      void node.play().catch(() => {});
-    };
-    play();
-    node.addEventListener("canplay", play);
-    return () => node.removeEventListener("canplay", play);
-  }, [reduceMotion]);
 
   if (reduceMotion) {
     return (

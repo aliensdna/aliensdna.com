@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useLoopingClip } from "@/lib/use-looping-clip";
 import { cn } from "@/lib/utils";
 
 type StrandSize = "nav" | "hero";
@@ -17,8 +18,9 @@ export function StrandMark({
   className?: string;
   label?: string;
 }) {
-  const ref = useRef<HTMLVideoElement>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const live = size === "hero" && !reduceMotion;
+  const ref = useLoopingClip(live);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -28,21 +30,9 @@ export function StrandMark({
     return () => media.removeEventListener("change", sync);
   }, []);
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node || reduceMotion) return;
-    node.muted = true;
-    const play = () => {
-      void node.play().catch(() => {});
-    };
-    play();
-    node.addEventListener("canplay", play);
-    return () => node.removeEventListener("canplay", play);
-  }, [reduceMotion]);
-
   const frame = (
     <img
-      src="/brand/strand-poster.jpg?v=2"
+      src="/brand/strand-poster.jpg?v=3"
       alt={label ?? ""}
       className="strand-video size-full"
       draggable={false}
@@ -53,8 +43,8 @@ export function StrandMark({
     <video
       ref={ref}
       className="strand-video size-full"
-      src="/brand/strand.mp4?v=2"
-      poster="/brand/strand-poster.jpg?v=2"
+      src="/brand/strand.mp4?v=3"
+      poster="/brand/strand-poster.jpg?v=3"
       autoPlay
       muted
       loop
@@ -75,7 +65,7 @@ export function StrandMark({
         className,
       )}
     >
-      {reduceMotion ? frame : clip}
+      {live ? clip : frame}
     </span>
   );
 }
