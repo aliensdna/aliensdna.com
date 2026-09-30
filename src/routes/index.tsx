@@ -120,6 +120,7 @@ function Home() {
         <Witness />
         <Specimens />
         <Signal entry={entry} onJoin={join} />
+        <SequenceClock />
       </main>
       <SiteFooter />
     </div>
@@ -403,6 +404,85 @@ function SignalForm({
       </form>
       {error ? <p className="mt-3 text-sm text-muted">{error}</p> : null}
     </div>
+  );
+}
+
+const RECORD_OPEN = Date.UTC(2026, 7, 25, 20, 0, 0);
+const BASE = ["A", "T", "G", "C"] as const;
+
+function toSequence(cycles: number, width = 12) {
+  let value = Math.max(0, Math.floor(cycles));
+  const glyphs: string[] = [];
+  for (let i = 0; i < width; i += 1) {
+    glyphs.push(BASE[value % 4] ?? "A");
+    value = Math.floor(value / 4);
+  }
+  return glyphs.reverse();
+}
+
+function SequenceClock() {
+  const [cycles, setCycles] = useState<number | null>(null);
+
+  useEffect(() => {
+    const tick = () =>
+      setCycles(Math.floor((Date.now() - RECORD_OPEN) / 1000));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const glyphs =
+    cycles == null ? Array.from({ length: 12 }, () => "·") : toSequence(cycles);
+  const readable =
+    cycles == null ? "—" : new Intl.NumberFormat("en-US").format(cycles);
+
+  return (
+    <section
+      id="clock"
+      className="border-t border-border px-6 py-20 sm:py-28"
+      aria-labelledby="clock-title"
+    >
+      <div className="mx-auto max-w-6xl">
+        <p className="text-xs font-medium uppercase tracking-mark text-muted">
+          04 · The clock
+        </p>
+        <h2
+          id="clock-title"
+          className="mt-4 max-w-xl font-display text-4xl italic tracking-display text-fg sm:text-5xl"
+        >
+          It has been counting since the record opened.
+        </h2>
+        <p className="mt-4 max-w-md text-sm leading-normal text-muted">
+          Four letters. No reset. Each second writes the next base.
+        </p>
+
+        <div className="clock-scan mt-12 overflow-hidden border-y border-border py-8">
+          <p
+            className="flex flex-wrap justify-center gap-x-3 gap-y-2 font-display text-5xl italic leading-none tracking-display sm:gap-x-5 sm:text-7xl"
+            aria-hidden="true"
+            suppressHydrationWarning
+          >
+            {glyphs.map((glyph, index) => (
+              <span
+                key={index}
+                className={index === glyphs.length - 1 ? "text-fg" : "text-subtle"}
+              >
+                {glyph}
+              </span>
+            ))}
+          </p>
+        </div>
+
+        <p
+          className="mt-6 text-center text-xs font-medium uppercase tracking-mark text-muted tabular-nums"
+          role="status"
+          aria-live="polite"
+          suppressHydrationWarning
+        >
+          {readable} cycles · ATGC
+        </p>
+      </div>
+    </section>
   );
 }
 

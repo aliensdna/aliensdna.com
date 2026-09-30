@@ -179,6 +179,34 @@ body::before {
   .ticker-track {
     animation: none;
   }
+
+  .clock-scan::after {
+    animation: none;
+  }
+}
+
+.clock-scan {
+  position: relative;
+}
+
+.clock-scan::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--color-fg);
+  opacity: 0.28;
+  animation: clock-scan 7s linear infinite;
+}
+
+@keyframes clock-scan {
+  from {
+    left: 0;
+  }
+  to {
+    left: 100%;
+  }
 }
 
 .archive-frame {
